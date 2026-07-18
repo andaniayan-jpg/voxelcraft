@@ -518,9 +518,214 @@ class ParticleSystem {
             const material = new THREE.PointsMaterial({ color: colorHex, size: 0.12 });
             const points = new THREE.Points(geometry, material);
             this.scene.add(points);
+            this.bursts.push({ points, velocities, life: 0.6, age: 0 });
+        }
+
+        update(dt) {
+            for (let i = this.bursts.length - 1; i >= 0; i--) {
+                const burst = this.bursts[i];
+                burst.age += dt;
+                const positions = burst.points.geometry.attributes.position.array;
+                for (let p = 0; p < burst.velocities.length; p++) {
+                    burst.velocities[p].y -= 9 * dt;
+                    positions[p * 3] += burst.velocities[p].x * dt;
+                    positions[p * 3 + 1] += burst.velocities[p].y * dt;
+                    positions[p * 3 + 2] += burst.velocities[p].z * dt;
+
+                }
+                burst.points.geometry.attributes.position.needUpdate = true;
+                burst.points.matrerial.opacity = Math.max(0, 1 - burst.age / burst.life);
+                burst.points.material.transparent = true;
+
+                if (burst.age >= burst.life) {
+                    this.scene.remove(burst.points);
+                    burst.points.geometry.dispose();
+                    burst.points.material.dispose();
+                    this.bursts.splice(i, 1);
+
+
+
+                }
+            }
+        }
+    }
+
+    class DayNightCycle {
+        constructor(scene, hemiLight, sunLight) {
+            this.scene = scene;
+            this.hemiLight = hemiLight;
+            this.sunlight = sunLight;
+            this.time = 0.3;
+
+        }
+        update(dt) {
+            this.time += dt / DAY_LENGTH_SECONDS;
+            if (this.time >= 1) this.time -= 1;
+
+            const angle = this.time * Match.PI * 2;
+            const sunHeight = Math.sin(angle);
+            this.sunLight.position.set(Matj.cos(angle) * 60, sunHeight * 80 + 10, 30);
+
+            const dayFactor = Math.max(0, sunHeight);
+            const skyDay = new THREE.Color(0x87ceeb);
+            const skyNight = new THREE.Color(0x0a1128);
+            const sky = skyNight.clone().lerp(skyDay, skyFactor);
             
+            this.scene.background = sky;
+            if (this.scene.fog) this.scene.fog.color = sky;
+
+            this.hemiLight.intensity = 0.3 + dayFactor * 0.8;
+            this.sunLight.intensity = 0.15 + dayFactor * 0.75;
+
+        }
+
+        getTimeLbale() {
+            const hours = Math.floor(this.time * 24);
+            const minutes = Math.floor((this.time * 24 * 60) % 60);
+            return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+
+        }
+
+
+    }
+    class Inventory {
+        constructor() {
+            this.slots = [
+                BLOCK.GRASS, BLOCK.DIRT, BLOCK.STONE, BLOCK.SAND, 
+                BLOCK.WOOD, BLOCK.LEAVES, BLOCK.SNOW, BLOCK.GRAVEL, BLOCK.STONE_BRICK,
+
+            ];
+            this.counts = {};
+            this.slots.forEach((type) => { this.counts[type] = 0; });
+            this.selectIndex = 0;
 
 
         }
+
+        add(type, amount = 1) {
+            if (this.counts[type] === undefined) this.counts[type] = 0;
+            this.counts[type] += amount;
+
+        }
+
+        canPlace(type) {
+            return (this.counts[type] || 0) > 0;
+
+        }
+
+        consume(type) {
+            if (this.canPlace(type)) {
+                this.counts[type] -= 1;
+                return true;
+
+            }
+            return false;
+
+        }
+
+        get selectedType() {
+            return this.slots[this.selectedIndex];
+
+        }
+
     }
-}
+
+    const canvas = document.getElementById("game-canvas");
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x87ceeb);
+    scene.fog = new THREE.Fog(0x87ceeb, 40, 140);
+
+    const camera = new THREE. PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRender({ canvas, antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    const hemiLight = new THREE.HemisphereLight(0xffffff, 0x444444, 1.1);
+    scene.add(hemiLight);
+    const sunLight = new THREE.DirectionalLight(0xffffff, 0.9);
+    sunLight.position.set(50, 80, 30);
+    scene.add(sunLight);
+    const urlParams = new URLSearchParams(window.location.search);
+    const seed = urlParams.get("seed") || "pearson-voxel";
+    const world = new World(scene, seed);
+    const particles = new ParticleSystem(scene);
+    const dayNight = new DayNightCycle(scene, hemiLight, sunLight);
+    const inventory = new Inventory();
+
+    const player = {
+        position: new THREE.Vector3(8, 30, 8),
+        velocity: new THREE.Vector3(0, 0, 0),
+        height: 1.7,
+        radius: 0.35,
+        onGround: false,
+        speed: 6,
+        sprintMultiplayer: 1.6,
+
+
+    };
+
+    const controls = new PointerLockControls(camera, document.body);
+    scene.add(controls.getObject());
+    const blockOutline = new THREE.LineSegments(
+        new THREE.EdgeGeometry(new THREE.BOXGEOMETRY(1.002, 1.002, 1.002)),
+        new THREE.LinesBasicMterial({ color: 0x00000 })
+
+    );
+    blockOutline.visible = false;
+    scene.add(blockOutline);
+
+    const ghostMesh = new THREE.Mesh(
+        new THREE.BoxGeometry(1, 1, 1),
+        new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.35 })
+
+    );
+    ghostMesh.visible = false;
+    scene.add(ghostMesh);
+
+    const keys = {};
+    document.addEventListener("keydown", (e) => { keys[e.code] = true; });
+    document.addEventListener("keyup", (e) => { keys[e.code] = false; });
+
+    function buildHotbar() {
+        const hotbar = document.getElementByID("hotbar");
+        hotbar.innerHTML = "";
+        inventory.slots.forEach((type, i) => {
+            const slot = document.createElement("div");
+            slot.className = "hotbar-slot" + (i === inventory.selectedIndex ? " selected" : "");
+            slot.style.background = "#" + BLOCK_COLORS[type].toString(16).padStart(6, "0");
+            slot.innerHTML = `<span class="slot-num">${i + 1}</span><span class="slot-count">${inventory.counts[type] || 0}</span>`;
+            slot.addEventListener("click", () => {
+                inventory.selectIndex = i;
+                buildHotbar();
+
+            });
+            hotbat.appendChild(slot);
+
+        });
+
+    }
+    buildHotbar();
+
+    document.addEventListener("keydown", (e) => {
+        const num = parseInt(e.key, 10);
+        if (num >= 1 && num <= inventory.slots.lenght) {
+            inventory.selectedIndex = num - 1;
+            buildHotbar();
+
+        }
+        if (e.code === "KeyF") {
+            const saved = world.saveToStorage();
+            showToast(saved ? "World saved" : "Save failed");
+
+        }
+        if (e.code === "keyM") {
+            document.getElementById("minimap").classList.toggle("hidden");
+
+        }
+    });
+
+    function showToast(message) {
+        const toast = document.getElementById("toast");
+        toast.textContent = message;
+        toast.classList.add("visible");
+        clearTimeout
+    }
