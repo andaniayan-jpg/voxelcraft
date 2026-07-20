@@ -1,25 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-<head> 
-<met charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0,, user-scalable=no" />
-<title>Voxel World</title>
-<link rel="stylesheet" href="style.css" />
-</head>
-<body>
-
-<canvas id="game-canvas"></canvas>
-<div id="hud">
-    <div id="crosshair"></div>
-    <div id="coords">X: 0 Y: 0 Z: 0</div>
-    <div id="fps">0 fps</div>
-    <div id="time-display">00:00</div>
-    <canvas id="minimap" width="130" height="130"></canvas>
-    <div id="toast"></div>
-    <div id="hotbar"></div>
-    <div id="controls-hint">
-        WASD move <!DOCTYPE html>
-<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
@@ -35,11 +15,12 @@
   <div id="coords">X: 0  Y: 0  Z: 0</div>
   <div id="fps">0 fps</div>
   <div id="time-display">00:00</div>
+  <div id="biome-display"></div>
   <canvas id="minimap" width="130" height="130"></canvas>
   <div id="toast"></div>
   <div id="hotbar"></div>
   <div id="controls-hint">
-    WASD move · Space jump · Shift sprint · Left-click break · Right-click place · 1-9 select block · F save · M toggle minimap
+    WASD move · Space jump · Shift sprint · Left-click break · Right-click place · 1-9 select block · C craft · F save · M minimap · P shadows
   </div>
 </div>
 
@@ -53,41 +34,14 @@
   <div id="touch-place" class="touch-action-btn">▦</div>
 </div>
 
-<div id="blocker">
-  <div class="menu-box">
-    <h1>Voxel World</h1>
-    <p>Click to play</p>
-    <div class="menu-controls">
-      <div><b>WASD</b> — move</div>
-      <div><b>Mouse</b> — look</div>
-      <div><b>Space</b> — jump</div>
-      <div><b>Shift</b> — sprint</div>
-      <div><b>Left click</b> — break block</div>
-      <div><b>Right click</b> — place block</div>
-      <div><b>1–9</b> — select block type</div>
-      <div><b>F</b> — save world</div>
+<div id="crafting-panel" class="hidden">
+  <div class="crafting-box">
+    <div class="crafting-header">
+      <h2>Crafting</h2>
+      <button id="close-crafting">✕</button>
     </div>
-    <div class="menu-extra">On mobile, just tap to start — touch controls appear automatically.</div>
+    <div id="recipe-list"></div>
   </div>
-</div>
-
-<script type="module" src="main.js"></script>
-</body>
-</html> 
-    </div>
-       
-</div>
-
-
-<div id="touch-controls" class="hidden">
-    <div id="look-zone"></div>
-    <div id="joystick-knob"></div>
-
-</div>
-
-<div id="touch-jump" class="touch-action-btn">↑</div>
-<div id="touch-break" class="touch-action-btn">⛏</div>
-  <div id="touch-place" class="touch-action-btn">▦</div>
 </div>
 
 <div id="blocker">
@@ -101,14 +55,23 @@
       <div><b>Shift</b> — sprint</div>
       <div><b>Left click</b> — break block</div>
       <div><b>Right click</b> — place block</div>
-      <div><b>1–9</b> — select block type</div>
+      <div><b>1–9</b> — select block</div>
+      <div><b>C</b> — crafting menu</div>
       <div><b>F</b> — save world</div>
+      <div><b>P</b> — toggle shadows</div>
     </div>
     <div class="menu-extra">On mobile, just tap to start — touch controls appear automatically.</div>
   </div>
 </div>
 
+<script type="importmap">
+{
+  "imports": {
+    "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+    "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+  }
+}
+</script>
 <script type="module" src="main.js"></script>
 </body>
 </html>
-
