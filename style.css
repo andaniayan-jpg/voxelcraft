@@ -1,322 +1,409 @@
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-heighlight-color: transparent;
-    user-select: none;
-
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
 html, body {
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background: #000;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 }
 
 #game-canvas {
-    display: block;
-    width: 100%;
-    height: 100%;
-
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 .hidden {
-    display: none !important;
-
+  display: none !important;
 }
+
+
 
 #hud {
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    color: white;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  color: white;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
 }
 
-
 #crosshair {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 18px;
-    height: 18px;
-    transform: translate(-50%, -50%);
-
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 18px;
+  height: 18px;
+  transform: translate(-50%, -50%);
 }
 
 #crosshair::before, #crosshair::after {
+  content: "";
+  position: absolute;
+  background: white;
+  box-shadow: 0 0 2px rgba(0,0,0,0.8);
+}
 
-    content: "";
-    position: absolute;
-    background: white;
-    box-shadow: 0 0 2px rgba(0,0,0,0.8);
-
-
-
-
+#crosshair::before {
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  transform: translateY(-50%);
 }
 
 #crosshair::after {
-    left: 50%;
-    top: 0;
-    height: 100%;
-    width: 2px;
-    transform: translateX(-50%);
+  left: 50%;
+  top: 0;
+  height: 100%;
+  width: 2px;
+  transform: translateX(-50%);
 }
 
 #coords {
-    position: absolute;
-    top: 16px;
-    left: 16px;
-    font-family: "SF Mono", Consolas, monospace;
-    font-size: 13px;
-    background: rgba(0,0,0,0.35);
-    padding: 6px 10px;
-    border-radius: 6px;
-
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  font-family: "SF Mono", Consolas, monospace;
+  font-size: 13px;
+  background: rgba(0,0,0,0.35);
+  padding: 6px 10px;
+  border-radius: 6px;
 }
 
 #fps {
-    position: absolute;
-    top: 16px;
-    right: 16px;
-    font-family: "SF Mono", Consolas, monospace;
-    font-size: 13px;
-    background: rgba(0,0,0,0.35);
-    padding: 6px 10px;
-    border-radius: 6px;
-
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  font-family: "SF Mono", Consolas, monospace;
+  font-size: 13px;
+  background: rgba(0,0,0,0.35);
+  padding: 6px 10px;
+  border-radius: 6px;
 }
 
 #time-display {
-    position: absolute;
-    top: 53px;
-    right: 16px;
-    font-family: "SF Mono", Consolas, monospace;
-    font-sized: 13px;
-    background: rgba(0,0,0,0.35);
-    padding: 6px 10px;
-    border-radius: 6px;
+  position: absolute;
+  top: 52px;
+  right: 16px;
+  font-family: "SF Mono", Consolas, monospace;
+  font-size: 13px;
+  background: rgba(0,0,0,0.35);
+  padding: 6px 10px;
+  border-radius: 6px;
+}
 
+#biome-display {
+  position: absolute;
+  top: 88px;
+  right: 16px;
+  font-size: 12px;
+  background: rgba(30,90,160,0.55);
+  padding: 5px 10px;
+  border-radius: 6px;
+}
+
+#biome-display:empty {
+  display: none;
 }
 
 #controls-hint {
-    position: absolute;
-    bottom: 16px;
-    left: 50%;
-    transform: translateX(-50%);
-    font-size: 11.5px;
-    background: rgba(0,0,0,0.35);
-    padding: 6px 14px;
-    border-radius: 6px;
-    white-space: nowrap;
-
+  position: absolute;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 11px;
+  background: rgba(0,0,0,0.35);
+  padding: 6px 14px;
+  border-radius: 6px;
+  white-space: nowrap;
 }
+
 
 
 #hotbar {
-    position: absolute;
-    bottom: 60px;
-    left: 50;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 6px;
-    pointer-events: auto;
-
-
-
+  position: absolute;
+  bottom: 60px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 6px;
+  pointer-events: auto;
 }
 
 .hotbar-slot {
-    position: relative;
-    width: 46px;
-    height: 46px;
-    border-radius: 8px;
-    border: 2px solid rgba(0,0,0,0.4);
-    cursor: pointer;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
-    transition: transform 0.1s, border-color 0.1s;
-
+  position: relative;
+  width: 46px;
+  height: 46px;
+  border-radius: 8px;
+  border: 2px solid rgba(255,255,255,0.4);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+  transition: transform 0.1s, border-color 0.1s;
 }
 
 .hotbar-slot:hover {
-    transform: translateY(-3px);
-
+  transform: translateY(-3px);
 }
 
 .hotbar-slot.selected {
-    border-color: white;
-    box-shadow: 0 0 0 2px rgba(255,255,255,0.8), 0 2px 6px rgba(0,0,0,0.4);
-
+  border-color: white;
+  box-shadow: 0 0 0 2px rgba(255,255,255,0.8), 0 2px 6px rgba(0,0,0,0.4);
 }
 
 .slot-num {
-    position: absolute;
-    top: 2px;
-    left: 4px;
-    font-size: 10px;
-    font-weight: 700;
-    color: rgba(0,0,0,0.55);
-
+  position: absolute;
+  top: 2px;
+  left: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(0,0,0,0.55);
 }
 
 .slot-count {
-    position: absolute;
-    bottom: 2px;
-    right: 4px;
-    font-size: 11px;
-    font-weight: 800;
-    color: rgba(0,0,0,0.65);
-
+  position: absolute;
+  bottom: 2px;
+  right: 4px;
+  font-size: 11px;
+  font-weight: 800;
+  color: rgba(0,0,0,0.65);
 }
+
 
 
 #toast {
-    position: absolute;
-    top: 90px;
-    left: 50%;
-    transform: translateX(-50%) translateY(-10px);
-    background: rgba(0,0,0,0.7);
-    padding: 8px 16px;
-    border-radius: 20px;
-    font-size: 13px;
-    opacity: 0;
-    transition: opacity 0.25s, transform 0.25;
-    pointer-events: none;
+  position: absolute;
+  top: 90px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-10px);
+  background: rgba(0,0,0,0.7);
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  opacity: 0;
+  transition: opacity 0.25s, transform 0.25s;
+  pointer-events: none;
 }
 
-#toasr.visible {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-
+#toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
 }
+
+
 
 #minimap {
-    position: absolute;
-    top: 90px;
-    left: 16px;
-    width: 130px;
-    height: 130px;
-    border-radius: 50%;
-    border: 2px solid rgba(255,255,255,0.5);
-    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
-
+  position: absolute;
+  top: 122px;
+  left: 16px;
+  width: 130px;
+  height: 130px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.5);
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
 }
 
+
+
 #blocker {
-    position: fixed;
-    inset: 0;
-    background: rgba(10, 12, 18, 0.88);
-    display: flex;
-    align-items: center;
-    justify-content: center; 
-    cursor: pointer;
-    z-index: 10;
-
-
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 12, 18, 0.88);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 10;
 }
 
 .menu-box {
-    text-align: center;
-    color: white;
-    max-width: 420px;
-    padding: 0 20px;
-
+  text-align: center;
+  color: white;
+  max-width: 440px;
+  padding: 0 20px;
 }
 
 .menu-box h1 {
-    font-size: 40px;
-    margin-bottom: 8px;
-    letter-spacing: -0.02em;
-
+  font-size: 40px;
+  margin-bottom: 8px;
+  letter-spacing: -0.02em;
 }
 
 .menu-box p {
-    color: rgba(255,255,255,0.7);
-    margin-bottom: 28px;
-    font-size: 15px;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 28px;
+  font-size: 15px;
+}
 
+.menu-controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+  background: rgba(255,255,255,0.06);
+  padding: 18px;
+  border-radius: 12px;
+  text-align: left;
 }
 
 .menu-extra {
-    margin-top: 16px;
-    font-size: 12px;
-    color: rgba(255,255,255,0.5);
-
+  margin-top: 16px;
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
 }
 
-#touch-controls {
-    position: fixed;
-    inset: 0;
-    pointer-events: auto;
 
+
+#crafting-panel {
+  position: fixed;
+  inset: 0;
+  background: rgba(10, 12, 18, 0.75);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 12;
+}
+
+.crafting-box {
+  background: #171a22;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 14px;
+  width: 360px;
+  max-width: 90vw;
+  padding: 20px;
+  color: white;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+}
+
+.crafting-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.crafting-header h2 {
+  font-size: 18px;
+}
+
+#close-crafting {
+  background: rgba(255,255,255,0.08);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.recipe-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.recipe-swatch {
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.25);
+  flex-shrink: 0;
+}
+
+.recipe-label {
+  flex: 1;
+  font-size: 13px;
+  color: rgba(255,255,255,0.85);
+}
+
+.recipe-btn {
+  background: #4f8cff;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.recipe-btn:disabled {
+  background: rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.35);
+  cursor: not-allowed;
+}
+
+
+
+#touch-controls {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+}
+
+#look-zone {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
 }
 
 #joystick {
-    position: absolute;
-    bottom: 40px;
-    left: 30px;
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.15);
-    border: 2px solid rgba(255,255,255,0.35);
-    pointer-events: auto;
-    touch-action: none;
-
+  position: absolute;
+  bottom: 40px;
+  left: 30px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: 2px solid rgba(255,255,255,0.35);
+  pointer-events: auto;
+  touch-action: none;
 }
 
 #joystick-knob {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 44px;
-    height: 44px;
-    margin: -22px 0 0 -22px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.55);
-    transition: transform 0.05s linear;
-
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 44px;
+  height: 44px;
+  margin: -22px 0 0 -22px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.55);
+  transition: transform 0.05s linear;
 }
-
 
 .touch-action-btn {
-    position: absolute;
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.18);
-    border: 2px solid rgba(255,255,255,0.4);
-    color: white;
-    font-size: 22px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    pointer-events: auto;
-    touch-action: none;
-         
+  position: absolute;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.18);
+  border: 2px solid rgba(255,255,255,0.4);
+  color: white;
+  font-size: 22px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  touch-action: none;
 }
 
-#touch-jump {
-    bottom: 130px;
-    right: 30px;
+#touch-jump { bottom: 130px; right: 30px; }
+#touch-break { bottom: 40px; right: 110px; }
+#touch-place { bottom: 40px; right: 30px; }
 
-}
 
-#touch-break {
-    bottom: 40px;
-    right: 110px;
-
-}
-
-#touch-place {
-  bottom: 40px;
-  right: 30px;
-}
 
 @media (max-width: 700px) {
   #controls-hint { display: none; }
@@ -324,5 +411,5 @@ html, body {
   .hotbar-slot { width: 38px; height: 38px; }
   #hotbar { bottom: 150px; gap: 4px; }
   .menu-controls { grid-template-columns: 1fr; }
+  .crafting-box { width: 92vw; }
 }
-
